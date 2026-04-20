@@ -21,13 +21,31 @@ function draw() {
 
   // 在 Graphics 物件上繪製內容
   pg.clear(); // 務必呼叫 clear()，讓背景保持透明，否則會遮住視訊
-  pg.fill(255, 255, 0); // 黃色
-  pg.noStroke();
-  pg.ellipse(pg.width / 2, pg.height / 2, 50, 50); // 在畫布中央畫一個圓
-  pg.fill(255);
-  pg.textAlign(CENTER, CENTER);
-  pg.textSize(40);
-  pg.text("Graphics Overlay", pg.width / 2, pg.height / 2 + 60);
+  
+  // 讀取攝影機像素
+  capture.loadPixels();
+
+  // 確保攝影機已經讀取到影像資料
+  if (capture.pixels.length > 0) {
+    pg.fill(0, 255, 0); // 設定文字顏色為綠色（在畫面上較易辨識）
+    pg.textSize(8);
+    pg.textAlign(CENTER, CENTER);
+
+    // 以 20x20 為一個單位進行取樣
+    for (let y = 0; y < capture.height; y += 20) {
+      for (let x = 0; x < capture.width; x += 20) {
+        // 計算該像素在 pixels 陣列中的索引位置 [R, G, B, A]
+        let index = (x + y * capture.width) * 4;
+        let r = capture.pixels[index];
+        let g = capture.pixels[index + 1];
+        let b = capture.pixels[index + 2];
+        
+        // 計算平均值並顯示
+        let avg = Math.floor((r + g + b) / 3);
+        pg.text(avg, x + 10, y + 10); // 在 20x20 區塊的中心顯示數字
+      }
+    }
+  }
 
   // 修正攝影機左右顛倒（鏡像）問題
   push();
