@@ -5,10 +5,11 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   // Initialize camera capture
   capture = createCapture(VIDEO);
+  // 設定攝影機解析度，確保與後續 Graphics 畫布一致
+  capture.size(640, 480);
   // Hide the default video element created by createCapture
   capture.hide();
-
-  // 產生一個與視訊內容比例相符的 Graphics 畫布 (預設通常為 640x480)
+  // 產生一個與視訊畫面寬高完全相同的 Graphics 畫布
   pg = createGraphics(640, 480);
 }
 
@@ -34,13 +35,17 @@ function draw() {
     // 以 20x20 為一個單位進行取樣
     for (let y = 0; y < capture.height; y += 20) {
       for (let x = 0; x < capture.width; x += 20) {
-        // 計算該像素在 pixels 陣列中的索引位置 [R, G, B, A]
-        let index = (x + y * capture.width) * 4;
-        let r = capture.pixels[index];
-        let g = capture.pixels[index + 1];
-        let b = capture.pixels[index + 2];
+        // 取得該 20x20 單位中心點的像素座標，以代表該區塊的值
+        let sampleX = x + 10;
+        let sampleY = y + 10;
         
-        // 計算平均值並顯示
+        // 計算在 pixels 陣列中的索引位置 [R, G, B, A]
+        let index = (sampleX + sampleY * capture.width) * 4;
+        let r = capture.pixels[index] || 0;
+        let g = capture.pixels[index + 1] || 0;
+        let b = capture.pixels[index + 2] || 0;
+        
+        // 計算平均亮度 (pixel[0] + pixel[1] + pixel[2])/3 並顯示
         let avg = Math.floor((r + g + b) / 3);
         pg.text(avg, x + 10, y + 10); // 在 20x20 區塊的中心顯示數字
       }
